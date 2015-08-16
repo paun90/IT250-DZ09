@@ -41,5 +41,10 @@ public class RezervacijaDaoImpl implements RezervacijaDao{
         Rezervacija rezervacija = (Rezervacija) session.createCriteria(Rezervacija.class).add(Restrictions.eq("rezId", id)).uniqueResult();
         session.delete(rezervacija);
     }
+
+    @Override
+    public void dodajiliUpdatujRezervacija(Rezervacija rezervacija) {
+        session.merge(rezervacija);
+    }
     
 }

@@ -10,5 +10,6 @@ public interface RezervacijaDao {
     public Rezervacija getRezervacijaById(Integer id);
     public void dodajRezervaciju(Rezervacija rezervacija);
     public void obrisiRezervaciju(Integer id);
+    public void dodajiliUpdatujRezervacija (Rezervacija rezervacija);
     
 }

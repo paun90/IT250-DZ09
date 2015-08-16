@@ -19,35 +19,37 @@ import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.hibernate.annotations.CommitAfter;
 import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
-
+import org.apache.tapestry5.json.JSONObject;
 
 @ProtectedPage
 @RolesAllowed(value = {"Korisnik", "Admin", "Recepcionar"})
 public class DodavanjeRezervacija {
+
     @Property
+    @Persist
     private Rezervacija rezervacija;
-    
+
     @Property
     private Rezervacija onerezervacija;
-    
+
     @Inject
     private Messages messages;
-    
+
     @Inject
     private RezervacijaDao rezervacijaDao;
-    
-    @Inject 
+
+    @Inject
     private SobaDao sobaDao;
-    
+
     @Property
     private Soba sobid;
-    
+
     @Property
     @Persist
     private List<Soba> listaSoba;
-    
-    public ValueEncoder getEncoder(){
-        return new ValueEncoder<Soba>(){
+
+    public ValueEncoder getEncoder() {
+        return new ValueEncoder<Soba>() {
 
             @Override
             public String toClient(Soba v) {
@@ -59,39 +61,55 @@ public class DodavanjeRezervacija {
                 Soba sob = sobaDao.getSobaById(Integer.parseInt(string));
                 return sob;
             }
-            
+
         };
     }
-    
+
     @Property
     private List<Rezervacija> listaRezervacija;
-    void onActivate(){
+
+    void onActivate() {
         rezervacija = new Rezervacija();
-        if(listaRezervacija == null){
+        if (listaRezervacija == null) {
             listaRezervacija = new ArrayList<Rezervacija>();
         }
         listaRezervacija = rezervacijaDao.getListaSvihRezervacija();
         listaSoba = sobaDao.getListaSvihSoba();
     }
-    
+
     @CommitAfter
-    Object onSuccess(){
+    Object onSuccess() {
         rezervacija.setId(sobid);
-        rezervacijaDao.dodajRezervaciju(rezervacija);
+        rezervacijaDao.dodajiliUpdatujRezervacija(rezervacija);
+        rezervacija = new Rezervacija();
         return this;
     }
-    
-    public String getSoba(){
-        if(onerezervacija.getId() !=null){
+
+    public String getSoba() {
+        if (onerezervacija.getId() != null) {
             return onerezervacija.getId().getImesobe();
-        }else{
+        } else {
             return "";
         }
     }
-    
+
     @CommitAfter
-    Object onActionFromDelete(int id){
+    Object onActionFromDelete(int id) {
         rezervacijaDao.obrisiRezervaciju(id);
         return this;
+    }
+
+    @CommitAfter
+    Object onActionFromEdit(Rezervacija rezervacije) {
+        rezervacija = rezervacije;
+        return this;
+    }
+
+    public JSONObject getOptions() {
+        JSONObject json = new JSONObject();
+        json.put("bJQueryUI", true);
+        json.put("bStateSave", true);
+        json.put("bAutoWidth", true);
+        return json;
     }
 }

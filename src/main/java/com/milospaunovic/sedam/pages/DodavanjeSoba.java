@@ -7,15 +7,18 @@ import com.milospaunovic.sedam.services.SobaDao;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
+import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.hibernate.annotations.CommitAfter;
 import org.apache.tapestry5.ioc.annotations.Inject;
+import org.apache.tapestry5.json.JSONObject;
 
 @ProtectedPage
 @RolesAllowed(value = {"Admin", "Recepcionar"})
 public class DodavanjeSoba {
     
     @Property
+    @Persist
     private Soba soba;
     
     @Property
@@ -36,7 +39,8 @@ public class DodavanjeSoba {
     
     @CommitAfter
     Object onSuccess(){
-        sobaDao.dodajSobu(soba);
+        sobaDao.dodajIliUpdatujSoba(soba);
+        soba = new Soba();
         return this;
     }
     
@@ -44,6 +48,20 @@ public class DodavanjeSoba {
     Object onActionFromDelete(int id) {
         sobaDao.obrisiSobu(id);
         return this;
+    }
+    
+    @CommitAfter
+    Object onActionFromEdit(Soba sobe){
+        soba = sobe;
+        return this;
+    }
+    
+    public JSONObject getOptions(){
+        JSONObject json = new JSONObject();
+        json.put("bJQeryUI", true);
+        json.put("bStateSave", true);
+        json.put("bAutoWidth", true);
+        return json;
     }
     
 }
